@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_SEATS 15
+
+struct Passenger {
+    char passport[10];
+    char name[50];
+    char email[50];
+    int seat_num;
+};
+
+struct Passenger seats[MAX_SEATS]; // Array to hold passenger data
+int seat_count = 0; // Counter to track reserved seats
+
+void reserve_seat();
+void cancel_reservation();
+void display_records();
+
+int main() {
+    int choice;
+
+    while (1) {
+        printf("\n========================\n");
+        printf("  Airline Reservation System\n");
+        printf("========================\n");
+        printf("1. Reserve a Seat\n");
+        printf("2. Cancel Reservation\n");
+        printf("3. Display All Records\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        getchar(); // Clear the newline character left in the buffer
+
+        switch (choice) {
+            case 1:
+                reserve_seat();
+                break;
+            case 2:
+                cancel_reservation();
+                break;
+            case 3:
+                display_records();
+                break;
+            case 4:
+                printf("Exiting the system. Goodbye!\n");
+                exit(0);
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    }
+
+    return 0;
+}
+
+void reserve_seat() {
+    if (seat_count >= MAX_SEATS) {
+        printf("Sorry, all seats are full!\n");
+        return;
+    }
+
+    struct Passenger p;
+    printf("Enter your passport number: ");
+    scanf("%s", p.passport);
+    getchar(); // Clear the newline character left in the buffer
+    printf("Enter your name: ");
+    fgets(p.name, sizeof(p.name), stdin);
+    p.name[strcspn(p.name, "\n")] = 0; // Remove trailing newline
+    printf("Enter your email address: ");
+    scanf("%s", p.email);
+
+    p.seat_num = seat_count + 1;
+    seats[seat_count] = p;
+    seat_count++;
+
+    printf("Seat reserved successfully! Your seat number is: %d\n", p.seat_num);
+}
+
+void cancel_reservation() {
+    char passport[10];
+    printf("Enter the passport number for cancellation: ");
+    scanf("%s", passport);
+
+    for (int i = 0; i < seat_count; i++) {
+        if (strcmp(seats[i].passport, passport) == 0) {
+            printf("Reservation for %s (Seat %d) canceled successfully!\n", seats[i].name, seats[i].seat_num);
+
+            for (int j = i; j < seat_count - 1; j++) {
+                seats[j] = seats[j + 1];
+            }
+
+            seat_count--;
+            return;
+        }
+    }
+
+    printf("No reservation found with passport number %s.\n", passport);
+}
+
+void display_records() {
+    if (seat_count == 0) {
+        printf("No reservations found!\n");
+        return;
+    }
+
+    printf("\nCurrent Reservations:\n");
+    printf("========================\n");
+    for (int i = 0; i < seat_count; i++) {
+        printf("Seat Number: %d\n", seats[i].seat_num);
+        printf("Name: %s\n", seats[i].name);
+        printf("Passport Number: %s\n", seats[i].passport);
+        printf("Email: %s\n", seats[i].email);
+        printf("------------------------\n");
+    }
+}
